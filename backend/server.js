@@ -24,7 +24,7 @@ app.use(helmet({
 
 // CORS Configuration
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' ? false : true, // Enable all in dev, configure as needed in prod
+  origin: true, // Allow requesting origin dynamically
   credentials: true,
 };
 app.use(cors(corsOptions));
