@@ -1,43 +1,52 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import About from './components/About';
-import WhyChooseUs from './components/WhyChooseUs';
-import PlacementHighlights from './components/PlacementHighlights';
-import ApplicationForm from './components/ApplicationForm';
-import Feedback from './components/Feedback';
-import Contact from './components/Contact';
 import Footer from './components/Footer';
-import FloatingElements from './components/FloatingElements';
+import Home from './pages/Home';
+import JobOpeningsPage from './pages/JobOpeningsPage';
+import JobApplicationPage from './pages/JobApplicationPage';
+import PlacementStatisticsPage from './pages/PlacementStatisticsPage';
+import ContactPage from './pages/ContactPage';
+import AdminLoginPage from './pages/AdminLoginPage';
+import Dashboard from './pages/admin/Dashboard';
 import { Toaster } from 'react-hot-toast';
+
+// Layout wrapper to conditionally show public Navbar/Footer
+const AppContent = () => {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin') || location.pathname === '/admin-login';
+
+  return (
+    <div className="relative min-h-screen bg-gray-50 flex flex-col font-sans">
+      <Toaster position="top-center" />
+      
+      {/* Show Navbar on public routes */}
+      {!isAdminRoute && <Navbar />}
+
+      {/* Main content area */}
+      <main className="flex-grow">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/job-openings" element={<JobOpeningsPage />} />
+          <Route path="/job-application" element={<JobApplicationPage />} />
+          <Route path="/placement-statistics" element={<PlacementStatisticsPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/admin-login" element={<AdminLoginPage />} />
+          <Route path="/admin/dashboard" element={<Dashboard />} />
+        </Routes>
+      </main>
+
+      {/* Show Footer on public routes */}
+      {!isAdminRoute && <Footer />}
+    </div>
+  );
+};
 
 function App() {
   return (
-    <div className="relative min-h-screen bg-gray-50 overflow-hidden font-sans">
-      <Toaster position="top-center" />
-      
-      {/* Background animated blobs */}
-      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary-300/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
-        <div className="absolute top-[-10%] right-[-10%] w-96 h-96 bg-secondary-300/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="absolute bottom-[-20%] left-[20%] w-96 h-96 bg-primary-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
-      </div>
-
-      <div className="relative z-10">
-        <Navbar />
-        <main>
-          <Hero />
-          <About />
-          <WhyChooseUs />
-          <PlacementHighlights />
-          <ApplicationForm />
-          <Feedback />
-          <Contact />
-        </main>
-        <Footer />
-        <FloatingElements />
-      </div>
-    </div>
+    <Router>
+      <AppContent />
+    </Router>
   );
 }
 

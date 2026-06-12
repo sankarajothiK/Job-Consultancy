@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
-import logo from '../assets/logo.jpeg'; // add your logo path here
+import { NavLink, Link, useLocation } from 'react-router-dom';
+import { Menu, X, Briefcase, ShieldAlert } from 'lucide-react';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -14,98 +15,123 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location]);
+
   const navLinks = [
-    { name: 'Home', href: '#home' },
-    { name: 'About', href: '#about' },
-    { name: 'Apply Now', href: '#apply' },
-    { name: 'Why Choose Us', href: '#why-us' },
-    { name: 'Placements', href: '#placements' },
-    { name: 'Feedback', href: '#feedback' },
-    { name: 'Contact', href: '#contact' },
+    { name: 'Home', href: '/' },
+    { name: 'Job Openings', href: '/job-openings' },
+    { name: 'Job Application', href: '/job-application' },
+    { name: 'Placement Statistics', href: '/placement-statistics' },
+    { name: 'Contact Us', href: '/contact' },
   ];
+
+  const linkClass = ({ isActive }) => 
+    `text-sm font-semibold transition-all ${
+      isActive 
+        ? 'text-primary-600 border-b-2 border-primary-500 pb-1' 
+        : 'text-gray-600 hover:text-primary-600'
+    }`;
+
+  const mobileLinkClass = ({ isActive }) => 
+    `block px-4 py-3 text-base font-bold rounded-xl transition-all ${
+      isActive 
+        ? 'bg-primary-50 text-primary-700' 
+        : 'text-gray-600 hover:bg-gray-50 hover:text-primary-600'
+    }`;
 
   return (
     <nav
-      className={`fixed w-full z-50 transition-all duration-300 ${
+      className={`fixed w-full z-50 transition-all duration-350 ${
         isScrolled
-          ? 'bg-white/90 backdrop-blur-md shadow-md py-3'
-          : 'bg-transparent py-5'
+          ? 'bg-white/95 backdrop-blur-md shadow-md py-3'
+          : 'bg-white/80 backdrop-blur-sm py-4 border-b border-gray-100'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
           
           {/* Logo */}
-          <div className="flex items-center gap-3 flex-shrink-0 cursor-pointer">
-            <img
-              src={logo}
-              alt="Tenkasi Jobs Logo"
-              className="h-12 w-auto object-contain"
-            />
-
-            <span
-              className={`text-2xl font-bold tracking-tight ${
-                isScrolled ? 'text-primary-700' : 'text-gray-900'
-              }`}
-            >
+          <Link to="/" className="flex items-center gap-2.5 flex-shrink-0 cursor-pointer">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary-600 to-secondary-500 flex items-center justify-center text-white shadow-md shadow-primary-500/10">
+              <Briefcase size={20} />
+            </div>
+            <span className="text-xl font-extrabold tracking-tight text-slate-900 bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
               Tenkasi Jobs
             </span>
-          </div>
+          </Link>
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-6">
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center space-x-8">
             {navLinks.map((link) => (
-              <a
+              <NavLink
                 key={link.name}
-                href={link.href}
-                className="text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors"
+                to={link.href}
+                className={linkClass}
               >
                 {link.name}
-              </a>
+              </NavLink>
             ))}
 
-            <a
-              href="#apply"
-              className="ml-4 px-6 py-2.5 rounded-full bg-gradient-to-r from-primary-600 to-secondary-500 text-white font-medium hover:shadow-lg hover:shadow-primary-500/30 transition-all transform hover:-translate-y-0.5"
+            <Link
+              to="/admin-login"
+              className="p-2 text-gray-400 hover:text-slate-900 hover:bg-gray-100 rounded-lg transition-colors"
+              title="Admin Console"
+            >
+              <ShieldAlert size={18} />
+            </Link>
+
+            <Link
+              to="/job-application"
+              className="px-6 py-2.5 rounded-full bg-gradient-to-r from-primary-600 to-secondary-500 text-white font-bold text-sm shadow-md hover:shadow-lg hover:shadow-primary-500/20 hover:-translate-y-0.5 transition-all"
             >
               Apply Now
-            </a>
+            </Link>
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center">
+          {/* Mobile Menu Toggle */}
+          <div className="lg:hidden flex items-center gap-3">
+            <Link
+              to="/admin-login"
+              className="p-2 text-gray-500 hover:text-gray-900 rounded-lg"
+            >
+              <ShieldAlert size={20} />
+            </Link>
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-gray-700 hover:text-primary-600 focus:outline-none"
+              className="text-gray-700 hover:text-primary-600 focus:outline-none p-1"
             >
-              {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+              {isMobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
             </button>
           </div>
+
         </div>
       </div>
 
-      {/* Mobile Menu Panel */}
+      {/* Mobile Drawer Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg border-t border-gray-100">
-          <div className="px-4 pt-2 pb-6 space-y-2">
+        <div className="lg:hidden absolute top-full left-0 w-full bg-white shadow-xl border-t border-gray-100">
+          <div className="px-4 pt-3 pb-8 space-y-2">
             {navLinks.map((link) => (
-              <a
+              <NavLink
                 key={link.name}
-                href={link.href}
-                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-md"
-                onClick={() => setIsMobileMenuOpen(false)}
+                to={link.href}
+                className={mobileLinkClass}
               >
                 {link.name}
-              </a>
+              </NavLink>
             ))}
 
-            <a
-              href="#apply"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="block mt-4 text-center px-6 py-3 rounded-md bg-gradient-to-r from-primary-600 to-secondary-500 text-white font-medium shadow-md"
-            >
-              Apply Now
-            </a>
+            <div className="pt-4 border-t border-gray-100">
+              <Link
+                to="/job-application"
+                className="block text-center px-6 py-3 rounded-xl bg-gradient-to-r from-primary-600 to-secondary-500 text-white font-bold text-sm shadow-md"
+              >
+                Apply Now
+              </Link>
+            </div>
           </div>
         </div>
       )}
